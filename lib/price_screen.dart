@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'coin_data.dart';
+import 'package:flutter/cupertino.dart';
+import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -6,6 +9,52 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  String selectedCrypto = 'USD';
+
+  List<DropdownMenuItem<String>> getDropDownMenuItems(List<String> source) {
+    List<DropdownMenuItem<String>> result = [];
+    for (String str in source) {
+      result.add(
+        DropdownMenuItem(
+          child: Text(str),
+          value: str,
+        ),
+      );
+    }
+    return result;
+  }
+
+  List<Text> getPickerItems(List<String> source) {
+    List<Text> result = [];
+    for (String str in source) {
+      result.add(Text(str));
+    }
+    return result;
+  }
+
+  void selectorChanged(selection) {
+    setState(() {
+      selectedCrypto = selection;
+    });
+  }
+
+  Widget iosPicker() {
+    return CupertinoPicker(
+      itemExtent: 32.0,
+      onSelectedItemChanged: selectorChanged,
+      children: getPickerItems(currenciesList),
+      backgroundColor: Colors.lightBlue,
+    );
+  }
+
+  Widget androidDropDown() {
+    return DropdownButton<String>(
+      value: selectedCrypto,
+      items: getDropDownMenuItems(currenciesList),
+      onChanged: selectorChanged,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +76,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 BTC = ? $selectedCrypto',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
@@ -42,7 +91,7 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: null,
+            child: Platform.isIOS ? iosPicker() : androidDropDown(),
           ),
         ],
       ),
